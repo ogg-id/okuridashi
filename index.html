@@ -138,6 +138,39 @@ select{
 .plink{color:var(--accent-text);text-decoration:none}
 .plink:hover{text-decoration:underline}
 
+.login{
+  position:fixed;inset:0;z-index:100;background:var(--bg);display:none;align-items:center;justify-content:center;
+  padding:20px;overflow:auto;
+}
+body.locked .login{display:flex}
+body.locked header,body.locked .toolbar,body.locked main,body.locked footer{display:none}
+.lbox{
+  width:100%;max-width:380px;background:var(--surface);border:1px solid var(--line);border-radius:22px;
+  box-shadow:var(--shadow);padding:28px 24px 22px;text-align:center;
+}
+.lbox .logo{margin:0 auto 14px;width:54px;height:54px;font-size:24px;border-radius:16px}
+.lbox h2{font-size:1.3rem;letter-spacing:-.01em}
+.lbox .sub{margin:4px 0 20px}
+.lbox form{display:grid;gap:12px;text-align:left}
+.lbox label{font-size:.78rem;color:var(--muted);display:block;margin-bottom:4px}
+.lbox input{
+  width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--surface);
+  padding:0 14px;font-size:1rem;outline:none;
+}
+.lbox input:focus{border-color:var(--accent)}
+.pw{position:relative}
+.pw input{padding-right:48px}
+.pw button{
+  position:absolute;right:4px;top:50%;transform:translateY(-50%);width:38px;height:38px;border:0;background:transparent;
+  border-radius:10px;cursor:pointer;color:var(--muted);display:grid;place-items:center;
+}
+.pw svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.lerr{color:var(--accent-text);font-size:.85rem;min-height:1.2em;text-align:center}
+.lbox .btn{height:46px;width:100%}
+.hint{margin-top:16px;font-size:.82rem;color:var(--muted)}
+.hint code{background:var(--surface2);padding:2px 8px;border-radius:8px;font-family:inherit;color:var(--text)}
+.shake{animation:shake .35s}
+@keyframes shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
 footer{padding:24px 0 40px;text-align:center;font-size:.78rem;color:var(--muted)}
 footer a{color:var(--accent-text)}
 
@@ -151,7 +184,33 @@ footer a{color:var(--accent-text)}
 }
 </style>
 </head>
-<body>
+<body class="locked">
+
+<div class="login" id="login">
+  <div class="lbox" id="lbox">
+    <div class="logo">送</div>
+    <h2>Direktori LPK Indonesia</h2>
+    <div class="sub">Silakan login untuk melanjutkan</div>
+    <form id="loginForm" autocomplete="on">
+      <div>
+        <label for="lu">User</label>
+        <input id="lu" name="username" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required>
+      </div>
+      <div>
+        <label for="lp">Password</label>
+        <div class="pw">
+          <input id="lp" name="password" type="password" autocomplete="current-password" required>
+          <button type="button" id="togglePw" aria-label="Tampilkan password">
+            <svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="lerr" id="lerr" role="alert"></div>
+      <button class="btn" type="submit">Masuk</button>
+    </form>
+    <div class="hint">Hint: <code>Lpk/Indonesia</code></div>
+  </div>
+</div>
 
 <header>
   <div class="wrap">
@@ -163,9 +222,14 @@ footer a{color:var(--accent-text)}
           <div class="sub">Okuridashi Kikan (送り出し機関) · <span id="updated">memuat…</span></div>
         </div>
       </div>
-      <button class="icon-btn" id="themeBtn" aria-label="Ganti tema">
-        <svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-      </button>
+      <div class="row" style="flex:none;flex-wrap:nowrap">
+        <button class="icon-btn" id="themeBtn" aria-label="Ganti tema">
+          <svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
+        <button class="icon-btn" id="logoutBtn" aria-label="Keluar" title="Keluar">
+          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        </button>
+      </div>
     </div>
     <div class="stats" id="stats"></div>
   </div>
@@ -224,6 +288,7 @@ footer a{color:var(--accent-text)}
   // === Ganti jika nama file JSON berbeda ===
   const DATA_URL = 'lpk_indonesia_ois_20261119.json';
   const PAGE = 24;
+  const AUTH = { user: 'lpk', pass: 'Indonesia' }; // user tidak peka huruf besar/kecil
 
   // ---------- Util ----------
   const $ = (s, r = document) => r.querySelector(s);
@@ -532,7 +597,36 @@ footer a{color:var(--accent-text)}
   new IntersectionObserver(([en]) => $('#toolbar').classList.toggle('stuck', !en.isIntersecting), { threshold: 1 })
     .observe(Object.assign(document.body.insertBefore(el('div'), document.body.firstChild), { style: 'height:1px' }));
 
-  init();
+  // ---------- Login ----------
+  let loaded = false;
+  const authed = () => { try { return sessionStorage.getItem('lpk_auth') === '1'; } catch (e) { return false; } };
+  function unlock() {
+    document.body.classList.remove('locked');
+    if (!loaded) { loaded = true; init(); }
+  }
+  $('#loginForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const u = $('#lu').value.trim().toLowerCase(), p = $('#lp').value;
+    if (u === AUTH.user && p === AUTH.pass) {
+      try { sessionStorage.setItem('lpk_auth', '1'); } catch (err) {}
+      $('#lerr').textContent = ''; $('#lp').value = '';
+      unlock();
+    } else {
+      $('#lerr').textContent = 'User atau password salah.';
+      const b = $('#lbox'); b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake');
+      $('#lp').select();
+    }
+  });
+  $('#togglePw').onclick = () => {
+    const i = $('#lp'); i.type = i.type === 'password' ? 'text' : 'password';
+  };
+  $('#logoutBtn').onclick = () => {
+    try { sessionStorage.removeItem('lpk_auth'); } catch (e) {}
+    closeModal(); $('#lu').value = ''; $('#lp').value = '';
+    document.body.classList.add('locked'); window.scrollTo(0, 0); $('#lu').focus();
+  };
+
+  if (authed()) unlock(); else $('#lu').focus();
 })();
 </script>
 </body>
