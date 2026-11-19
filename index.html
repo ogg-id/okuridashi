@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Direktori LPK Indonesia – Okuridashi Kikan</title>
+<meta name="description" content="Direktori LPK (Lembaga Pelatihan Kerja) Indonesia yang terdaftar sebagai okuridashi kikan.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='34' fill='%23d9342b'/></svg>">
+<style>
+:root{
+  --bg:#f5f6f8; --surface:#ffffff; --surface2:#f0f2f5; --text:#1b2030; --muted:#6a7285;
+  --line:#e3e6ec; --accent:#d9342b; --accent-soft:#fdeceb; --accent-text:#b82820;
+  --ok:#14804a; --ok-soft:#e5f6ed; --blue:#2458c9; --blue-soft:#e8effd;
+  --shadow:0 1px 2px rgba(20,30,60,.06),0 4px 14px rgba(20,30,60,.06);
+  --radius:16px;
+}
+:root[data-theme="dark"]{
+  --bg:#0f1219; --surface:#181c26; --surface2:#212634; --text:#e9ecf3; --muted:#8e97ac;
+  --line:#2a3040; --accent:#ff5a4f; --accent-soft:#3a1d1f; --accent-text:#ff8a82;
+  --ok:#4cd08a; --ok-soft:#14302350; --blue:#7ea3ff; --blue-soft:#1b2745;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box;margin:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans JP","Hiragino Sans",sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.5;
+  padding-bottom:env(safe-area-inset-bottom,0);
+}
+button,input,select{font:inherit;color:inherit}
+a{color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+
+/* Header */
+header{
+  background:var(--surface);border-bottom:1px solid var(--line);
+  padding:calc(env(safe-area-inset-top,0px) + 18px) 0 16px;
+}
+.top{display:flex;align-items:center;gap:12px;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{width:42px;height:42px;border-radius:12px;background:var(--accent);flex:none;display:grid;place-items:center;color:#fff;font-weight:700;font-size:18px}
+h1{font-size:clamp(1.05rem,2.6vw,1.4rem);line-height:1.2;letter-spacing:-.01em}
+.sub{font-size:.8rem;color:var(--muted)}
+.icon-btn{
+  width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface);
+  cursor:pointer;display:grid;place-items:center;flex:none;
+}
+.icon-btn:hover{background:var(--surface2)}
+.icon-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.stat{background:var(--surface2);border-radius:12px;padding:10px 12px}
+.stat b{display:block;font-size:1.25rem;line-height:1.2}
+.stat span{font-size:.72rem;color:var(--muted)}
+
+/* Toolbar */
+.toolbar{position:sticky;top:0;z-index:20;background:var(--bg);padding:12px 0 10px;border-bottom:1px solid transparent}
+.toolbar.stuck{border-bottom-color:var(--line)}
+.search{position:relative}
+.search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round}
+.search input{
+  width:100%;height:48px;border-radius:14px;border:1px solid var(--line);background:var(--surface);
+  padding:0 44px 0 42px;font-size:1rem;outline:none;box-shadow:var(--shadow);
+}
+.search input:focus{border-color:var(--accent)}
+.clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:32px;height:32px;border:0;background:transparent;border-radius:50%;cursor:pointer;color:var(--muted);font-size:20px;display:none}
+.clear.show{display:block}
+.filters{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+select{
+  height:42px;border-radius:12px;border:1px solid var(--line);background:var(--surface);padding:0 10px;width:100%;min-width:0;cursor:pointer;
+}
+.chips{display:flex;gap:8px;margin-top:10px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;
+  font-size:.85rem;cursor:pointer;white-space:nowrap;
+}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.resultbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:14px 0 10px;font-size:.88rem;color:var(--muted)}
+.linkbtn{background:none;border:0;color:var(--accent-text);cursor:pointer;font-size:.88rem;padding:6px 0}
+.linkbtn:hover{text-decoration:underline}
+
+/* Grid & cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;
+  box-shadow:var(--shadow);cursor:pointer;display:flex;flex-direction:column;gap:10px;
+  text-align:left;width:100%;transition:transform .15s,border-color .15s;
+}
+.card:hover{transform:translateY(-2px);border-color:var(--accent)}
+.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.card h3{font-size:1.02rem;line-height:1.3;overflow-wrap:anywhere}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.badge{font-size:.72rem;border-radius:999px;padding:2px 9px;background:var(--surface2);color:var(--muted);white-space:nowrap}
+.badge.prov{background:var(--blue-soft);color:var(--blue)}
+.badge.jp{background:var(--accent-soft);color:var(--accent-text)}
+.badge.ok{background:var(--ok-soft);color:var(--ok)}
+.meta{font-size:.85rem;color:var(--muted);display:grid;gap:4px}
+.meta div{display:flex;gap:8px}
+.meta svg{width:15px;height:15px;flex:none;margin-top:3px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.meta span{overflow-wrap:anywhere}
+.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-foot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:10px;border-top:1px dashed var(--line);font-size:.78rem;color:var(--muted)}
+
+.more{display:block;margin:22px auto 40px;padding:12px 28px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;box-shadow:var(--shadow)}
+.more:hover{border-color:var(--accent)}
+.empty,.loading{text-align:center;padding:60px 16px;color:var(--muted)}
+.empty b{display:block;font-size:1.1rem;color:var(--text);margin-bottom:4px}
+.loadbox{max-width:480px;margin:40px auto;background:var(--surface);border:1px dashed var(--accent);border-radius:var(--radius);padding:24px;text-align:center}
+.loadbox p{color:var(--muted);font-size:.9rem;margin:6px 0 14px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;border-radius:12px;
+  background:var(--accent);color:#fff;border:0;cursor:pointer;text-decoration:none;font-size:.92rem;
+}
+.btn.alt{background:var(--surface2);color:var(--text)}
+.btn.wa{background:#1fa855}
+.btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* Modal */
+.overlay{position:fixed;inset:0;background:rgba(10,14,24,.55);z-index:50;display:none;align-items:center;justify-content:center;padding:20px}
+.overlay.open{display:flex}
+.modal{
+  background:var(--surface);border-radius:20px;width:100%;max-width:640px;max-height:90vh;overflow:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,.35);animation:pop .18s ease-out;
+}
+@keyframes pop{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+.mhead{position:sticky;top:0;background:var(--surface);padding:18px 18px 12px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:flex-start;justify-content:space-between;z-index:1}
+.mhead h2{font-size:1.15rem;line-height:1.3;overflow-wrap:anywhere}
+.mbody{padding:16px 18px 22px;display:grid;gap:16px}
+.sec h4{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+.sec p,.sec li{font-size:.94rem;overflow-wrap:anywhere}
+.sec ul{padding-left:0;list-style:none;display:grid;gap:6px}
+.sec .jtext{white-space:pre-wrap}
+.office{background:var(--surface2);border-radius:12px;padding:10px 12px;font-size:.9rem;display:grid;gap:2px}
+.office a{color:var(--accent-text)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.plink{color:var(--accent-text);text-decoration:none}
+.plink:hover{text-decoration:underline}
+
+footer{padding:24px 0 40px;text-align:center;font-size:.78rem;color:var(--muted)}
+footer a{color:var(--accent-text)}
+
+@media (max-width:640px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .filters{grid-template-columns:1fr 1fr}
+  .filters select:last-child{grid-column:1 / -1}
+  .grid{grid-template-columns:1fr}
+  .overlay{padding:0;align-items:flex-end}
+  .modal{max-width:none;border-radius:20px 20px 0 0;max-height:92vh}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <div class="logo">送</div>
+        <div>
+          <h1>Direktori LPK Indonesia</h1>
+          <div class="sub">Okuridashi Kikan (送り出し機関) · <span id="updated">memuat…</span></div>
+        </div>
+      </div>
+      <button class="icon-btn" id="themeBtn" aria-label="Ganti tema">
+        <svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+    <div class="stats" id="stats"></div>
+  </div>
+</header>
+
+<div class="toolbar" id="toolbar">
+  <div class="wrap">
+    <div class="search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Cari nama, alamat, perwakilan, email, telepon…" autocomplete="off" enterkeyhint="search">
+      <button class="clear" id="clearQ" aria-label="Hapus pencarian">×</button>
+    </div>
+    <div class="filters">
+      <select id="fProv" aria-label="Provinsi"></select>
+      <select id="fYear" aria-label="Tahun izin"></select>
+      <select id="fSort" aria-label="Urutkan">
+        <option value="name">Urut: Nama A–Z</option>
+        <option value="new">Urut: Izin terbaru</option>
+        <option value="old">Urut: Izin terlama</option>
+        <option value="id">Urut: Nomor ID</option>
+      </select>
+    </div>
+    <div class="chips">
+      <button class="chip" data-f="office" aria-pressed="false">🇯🇵 Ada kantor di Jepang</button>
+      <button class="chip" data-f="web" aria-pressed="false">🌐 Ada website</button>
+      <button class="chip" data-f="wa" aria-pressed="false">💬 Bisa WhatsApp</button>
+      <button class="chip" data-f="info" aria-pressed="false">📄 Ada info tambahan</button>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="resultbar">
+    <span id="count"></span>
+    <span>
+      <button class="linkbtn" id="resetBtn">Reset filter</button> ·
+      <button class="linkbtn" id="csvBtn">Unduh CSV</button>
+    </span>
+  </div>
+  <div id="list"></div>
+  <button class="more" id="moreBtn" hidden>Tampilkan lebih banyak</button>
+</main>
+
+<footer>
+  <div class="wrap">Data bersumber dari <a href="https://www.gai-rou.com/" target="_blank" rel="noopener">gai-rou.com</a>. Selalu verifikasi ke sumber resmi sebelum menghubungi.</div>
+</footer>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  // === Ganti jika nama file JSON berbeda ===
+  const DATA_URL = 'lpk_indonesia_ois_20261119.json';
+  const PAGE = 24;
+
+  // ---------- Util ----------
+  const $ = (s, r = document) => r.querySelector(s);
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const ICON = {
+    pin: '<svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+    user: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',
+    mail: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+    phone: '<svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>',
+    globe: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>',
+    ext: '<svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4 10 14M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
+    dl: '<svg viewBox="0 0 24 24"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14"/></svg>'
+  };
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  // ---------- Provinsi (deteksi dari alamat) ----------
+  const PROV = [
+    ['Aceh', 'aceh'],
+    ['Sumatera Utara', 'sumatera utara|sumatra utara|sumut|medan|deli serdang|binjai|pematang siantar|tebing tinggi'],
+    ['Sumatera Barat', 'sumatera barat|sumbar|padang|bukittinggi|payakumbuh|solok'],
+    ['Kepulauan Riau', 'kepulauan riau|kepri|batam|tanjung pinang|bintan'],
+    ['Riau', 'riau|pekanbaru|dumai'],
+    ['Jambi', 'jambi'],
+    ['Sumatera Selatan', 'sumatera selatan|sumsel|palembang|ogan|muara enim'],
+    ['Bengkulu', 'bengkulu'],
+    ['Lampung', 'lampung|gedong tataan|pesawaran|metro|pringsewu|tanggamus'],
+    ['Bangka Belitung', 'bangka|belitung|pangkalpinang'],
+    ['Banten', 'banten|tangerang|serang|cilegon|pandeglang|lebak'],
+    ['DKI Jakarta', 'jakarta|dki|cakung|jatinegara|kementrian pertanian|kementerian pertanian'],
+    ['Jawa Barat', 'jawa barat|jabar|west java|bandung|bndung|antapani|jatinangor|bogor|bekasi|depok|cirebon|sumedang|garut|tasikmalaya|cianjur|sukabumi|karawang|purwakarta|subang|indramayu|majalengka|kuningan|ciamis|cimahi|pangandaran|banjar'],
+    ['Jawa Tengah', 'jawa tengah|jateng|central java|semarang|klaten|solo|surakarta|delanggu|magelang|kudus|pati|jepara|purwokerto|banyumas|cilacap|tegal|pekalongan|brebes|kebumen|purworejo|wonosobo|temanggung|boyolali|sukoharjo|karanganyar|sragen|wonogiri|grobogan|demak|rembang|blora|batang|kendal|salatiga|purbalingga|banjarnegara|pemalang'],
+    ['DI Yogyakarta', 'yogyakarta|jogja|sleman|bantul|kulon progo|gunungkidul|diy'],
+    ['Jawa Timur', 'jawa timur|jatim|east java|surabaya|citraland|malang|sidoarjo|kediri|jember|banyuwangi|madiun|blitar|ponorogo|lamongan|gresik|mojokerto|pasuruan|probolinggo|tulungagung|nganjuk|ngawi|magetan|pacitan|trenggalek|tuban|bojonegoro|jombang|lumajang|situbondo|bondowoso|bangkalan|sampang|pamekasan|sumenep|batu'],
+    ['Bali', 'bali|denpasar|badung|gianyar|tabanan|jembrana|buleleng|karangasem|klungkung|bangli'],
+    ['NTB', 'nusa tenggara barat|ntb|lombok|mataram|sumbawa|bima|dompu'],
+    ['NTT', 'nusa tenggara timur|ntt|kupang|flores|sumba'],
+    ['Kalimantan', 'kalimantan|pontianak|banjarmasin|balikpapan|samarinda|palangkaraya'],
+    ['Sulawesi', 'sulawesi|minahasa|tondano|manado|makassar|gorontalo|kendari|palu|bone|gowa|sulsel'],
+    ['Maluku & Papua', 'maluku|papua|ambon|jayapura']
+  ].map(([n, re]) => [n, new RegExp('\\b(' + re + ')\\b', 'i')]);
+  const detectProv = a => { for (const [n, re] of PROV) if (re.test(a || '')) return n; return 'Lainnya'; };
+
+  // ---------- Telepon & web ----------
+  const splitPhones = p => (p || '').split(/\s*[\/;,]\s*(?=[\d(+])/).map(s => s.trim()).filter(Boolean);
+  const waNumber = p => {
+    let d = p.replace(/[^\d+]/g, '');
+    if (d.startsWith('+')) d = d.slice(1);
+    if (/^08\d{7,12}$/.test(d)) return '62' + d.slice(1);
+    if (/^628\d{7,12}$/.test(d)) return d;
+    return null;
+  };
+  const telHref = p => 'tel:' + p.replace(/[^\d+]/g, '');
+  const webHref = w => /^https?:\/\//i.test(w) ? w : 'https://' + w;
+  const parseDate = s => { const m = /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/.exec(s || ''); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; };
+  const fmtDate = s => { const d = parseDate(s); return d ? d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : (s || '–'); };
+  const INFO_KEYS = ['note', 'strengths', 'features', 'past_results', 'main_client', 'coverage_area', 'languages', 'fax'];
+
+  // ---------- State ----------
+  let DATA = [];
+  let view = [];
+  let shown = PAGE;
+  const S = { q: '', prov: '', year: '', sort: 'name', office: false, web: false, wa: false, info: false };
+
+  // ---------- Tema ----------
+  const root = document.documentElement;
+  try { const t = localStorage.getItem('theme'); if (t) root.dataset.theme = t; } catch (e) {}
+  if (!root.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches) root.dataset.theme = 'dark';
+  $('#themeBtn').onclick = () => {
+    const t = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = t;
+    try { localStorage.setItem('theme', t); } catch (e) {}
+  };
+
+  // ---------- Load ----------
+  async function init() {
+    $('#list').innerHTML = '<div class="loading">Memuat data…</div>';
+    try {
+      const r = await fetch(DATA_URL, { cache: 'no-cache' });
+      if (!r.ok) throw new Error(r.status);
+      setData(await r.json());
+    } catch (err) {
+      showPicker();
+    }
+  }
+
+  function showPicker() {
+    const box = el('div', 'loadbox');
+    box.innerHTML = '<b>Data belum bisa dimuat otomatis</b><p>Buka lewat GitHub Pages / server lokal, atau pilih file JSON secara manual.</p>';
+    const inp = el('input'); inp.type = 'file'; inp.accept = '.json,application/json'; inp.hidden = true;
+    const btn = el('button', 'btn', 'Pilih file JSON');
+    btn.onclick = () => inp.click();
+    inp.onchange = async () => {
+      const f = inp.files[0]; if (!f) return;
+      try { setData(JSON.parse(await f.text())); } catch (e) { alert('File JSON tidak valid.'); }
+    };
+    box.append(btn, inp);
+    $('#list').replaceChildren(box);
+  }
+
+  function setData(arr) {
+    if (!Array.isArray(arr)) { alert('Format JSON harus berupa array.'); return; }
+    DATA = arr.map((o, i) => {
+      const prov = detectProv(o.address);
+      const d = parseDate(o.permit_date);
+      const phones = splitPhones(o.phone);
+      const offices = Array.isArray(o.domestic_offices) ? o.domestic_offices : [];
+      const hay = [o.id, o.name, o.address, o.representative, o.email, o.phone, o.website, o.note, prov,
+        ...offices.map(x => [x.representative, x.address, x.email].join(' '))].join(' ').toLowerCase();
+      return {
+        ...o, _i: i, _prov: prov, _ts: d ? d.getTime() : 0, _year: d ? String(d.getFullYear()) : '',
+        _phones: phones, _wa: phones.some(waNumber), _offices: offices,
+        _num: parseInt(String(o.id || '').replace(/\D/g, ''), 10) || 0,
+        _info: INFO_KEYS.some(k => o[k]), _hay: hay
+      };
+    });
+    const m = /(\d{4})(\d{2})(\d{2})/.exec(DATA_URL);
+    $('#updated').textContent = m ? 'data ' + new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : DATA.length + ' data';
+    buildFilters();
+    renderStats();
+    apply();
+  }
+
+  function buildFilters() {
+    const provCount = {}; const yearCount = {};
+    DATA.forEach(x => { provCount[x._prov] = (provCount[x._prov] || 0) + 1; if (x._year) yearCount[x._year] = (yearCount[x._year] || 0) + 1; });
+    const fp = $('#fProv'); fp.innerHTML = '<option value="">Semua provinsi</option>';
+    Object.entries(provCount).sort((a, b) => (a[0] === 'Lainnya') - (b[0] === 'Lainnya') || b[1] - a[1])
+      .forEach(([p, n]) => fp.append(new Option(`${p} (${n})`, p)));
+    const fy = $('#fYear'); fy.innerHTML = '<option value="">Semua tahun izin</option>';
+    Object.keys(yearCount).sort().reverse().forEach(y => fy.append(new Option(`${y} (${yearCount[y]})`, y)));
+  }
+
+  function renderStats() {
+    const provs = new Set(DATA.map(x => x._prov).filter(p => p !== 'Lainnya')).size;
+    const items = [
+      [DATA.length, 'Total LPK'],
+      [provs, 'Wilayah'],
+      [DATA.filter(x => x._offices.length).length, 'Punya kantor di Jepang'],
+      [DATA.filter(x => x.website).length, 'Punya website']
+    ];
+    $('#stats').replaceChildren(...items.map(([n, l]) => { const d = el('div', 'stat'); d.append(el('b', '', n.toLocaleString('id-ID')), el('span', '', l)); return d; }));
+  }
+
+  // ---------- Filter & sort ----------
+  function apply() {
+    const terms = S.q.toLowerCase().split(/\s+/).filter(Boolean);
+    view = DATA.filter(x =>
+      (!S.prov || x._prov === S.prov) &&
+      (!S.year || x._year === S.year) &&
+      (!S.office || x._offices.length) &&
+      (!S.web || x.website) &&
+      (!S.wa || x._wa) &&
+      (!S.info || x._info) &&
+      terms.every(t => x._hay.includes(t))
+    );
+    const cmp = {
+      name: (a, b) => (a.name || '').localeCompare(b.name || '', 'id', { sensitivity: 'base' }),
+      new: (a, b) => b._ts - a._ts || a._num - b._num,
+      old: (a, b) => a._ts - b._ts || a._num - b._num,
+      id: (a, b) => a._num - b._num
+    }[S.sort];
+    view.sort(cmp);
+    shown = PAGE;
+    render();
+  }
+
+  // ---------- Render ----------
+  function card(x) {
+    const b = el('button', 'card'); b.type = 'button';
+    b.onclick = () => openModal(x);
+    const top = el('div', 'row');
+    top.append(el('span', 'badge prov', x._prov), el('span', 'badge', x.id));
+    if (x._offices.length) top.append(el('span', 'badge jp', '🇯🇵 Kantor Jepang'));
+    if (x._year) top.append(el('span', 'badge', 'Izin ' + x._year));
+    const h = el('h3', '', x.name || '(tanpa nama)');
+    const meta = el('div', 'meta');
+    const line = (icon, text, cls) => { const d = el('div'); d.innerHTML = ICON[icon]; d.append(el('span', cls || '', text)); return d; };
+    if (x.representative) meta.append(line('user', x.representative));
+    if (x.address) meta.append(line('pin', x.address, 'clamp'));
+    if (x.email) meta.append(line('mail', x.email));
+    const foot = el('div', 'card-foot');
+    foot.append(el('span', '', 'Izin: ' + fmtDate(x.permit_date)), el('span', '', 'Detail →'));
+    b.append(top, h, meta, foot);
+    return b;
+  }
+
+  function render() {
+    $('#count').textContent = `${view.length.toLocaleString('id-ID')} dari ${DATA.length.toLocaleString('id-ID')} LPK`;
+    const list = $('#list');
+    if (!view.length) {
+      list.innerHTML = '<div class="empty"><b>Tidak ada hasil</b>Coba ubah kata kunci atau reset filter.</div>';
+      $('#moreBtn').hidden = true; return;
+    }
+    const g = el('div', 'grid');
+    view.slice(0, shown).forEach(x => g.append(card(x)));
+    list.replaceChildren(g);
+    const more = $('#moreBtn');
+    more.hidden = shown >= view.length;
+    more.textContent = `Tampilkan lebih banyak (${Math.min(PAGE, view.length - shown)} lagi dari ${view.length - shown})`;
+  }
+
+  // ---------- Modal ----------
+  function sec(title, node) {
+    const s = el('div', 'sec'); s.append(el('h4', '', title)); s.append(node); return s;
+  }
+  function openModal(x) {
+    const m = $('#modal');
+    const head = el('div', 'mhead');
+    const hl = el('div');
+    const badges = el('div', 'row'); badges.style.marginBottom = '6px';
+    badges.append(el('span', 'badge prov', x._prov), el('span', 'badge', x.id));
+    hl.append(badges, el('h2', '', x.name));
+    const close = el('button', 'icon-btn'); close.type = 'button'; close.setAttribute('aria-label', 'Tutup'); close.textContent = '✕';
+    close.onclick = closeModal;
+    head.append(hl, close);
+
+    const body = el('div', 'mbody');
+
+    // aksi cepat
+    const act = el('div', 'actions');
+    const mk = (cls, icon, label, href, ext) => { const a = el('a', 'btn ' + cls); a.innerHTML = ICON[icon] + esc(label); a.href = href; if (ext) { a.target = '_blank'; a.rel = 'noopener'; } return a; };
+    const waP = x._phones.map(waNumber).find(Boolean);
+    if (waP) act.append(mk('wa', 'phone', 'WhatsApp', 'https://wa.me/' + waP, true));
+    if (x.email) act.append(mk('alt', 'mail', 'Email', 'mailto:' + x.email));
+    if (x.website) act.append(mk('alt', 'globe', 'Website', webHref(x.website), true));
+    if (x.url) act.append(mk('alt', 'ext', 'Sumber', x.url, true));
+    if (act.children.length) body.append(act);
+
+    if (x.representative) body.append(sec('Perwakilan', el('p', '', x.representative)));
+    if (x.address) {
+      const p = el('p', '', x.address);
+      const a = el('a', 'plink', ' · Buka peta'); a.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(x.address); a.target = '_blank'; a.rel = 'noopener';
+      p.append(a); body.append(sec('Alamat', p));
+    }
+    if (x._phones.length) {
+      const ul = el('ul');
+      x._phones.forEach(p => { const li = el('li'); const a = el('a', 'plink', p); a.href = telHref(p); li.append(a); ul.append(li); });
+      body.append(sec('Telepon', ul));
+    }
+    if (x.fax) body.append(sec('Fax', el('p', '', x.fax)));
+    if (x.email) { const a = el('a', 'plink', x.email); a.href = 'mailto:' + x.email; const p = el('p'); p.append(a); body.append(sec('Email', p)); }
+    if (x.website) { const a = el('a', 'plink', x.website); a.href = webHref(x.website); a.target = '_blank'; a.rel = 'noopener'; const p = el('p'); p.append(a); body.append(sec('Website', p)); }
+    body.append(sec('Tanggal izin', el('p', '', fmtDate(x.permit_date))));
+
+    if (x._offices.length) {
+      const wrap = el('div'); wrap.style.display = 'grid'; wrap.style.gap = '8px';
+      x._offices.forEach(o => {
+        const d = el('div', 'office');
+        if (o.representative) d.append(el('b', '', o.representative));
+        if (o.address) d.append(el('span', '', o.address));
+        if (o.phone) { const a = el('a', '', o.phone); a.href = telHref(o.phone); d.append(a); }
+        if (o.email) { const a = el('a', '', o.email); a.href = 'mailto:' + o.email; d.append(a); }
+        wrap.append(d);
+      });
+      body.append(sec('Kantor di Jepang', wrap));
+    }
+
+    const extra = [['note', 'Catatan'], ['coverage_area', 'Wilayah cakupan'], ['languages', 'Bahasa'], ['past_results', 'Hasil/penempatan sebelumnya'],
+      ['main_client', 'Klien utama'], ['strengths', 'Keunggulan / bidang'], ['features', 'Fitur / kelebihan']];
+    extra.forEach(([k, label]) => { if (x[k]) { const p = el('p', 'jtext', x[k]); p.lang = 'ja'; body.append(sec(label, p)); } });
+
+    m.replaceChildren(head, body);
+    $('#overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    m.scrollTop = 0;
+    close.focus();
+  }
+  function closeModal() { $('#overlay').classList.remove('open'); document.body.style.overflow = ''; }
+  $('#overlay').addEventListener('click', e => { if (e.target.id === 'overlay') closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // ---------- CSV ----------
+  function downloadCSV() {
+    const cols = ['id', 'name', 'address', 'representative', 'phone', 'email', 'website', 'permit_date', 'url'];
+    const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+    const rows = [[...cols, 'provinsi', 'kantor_jepang'].map(q).join(',')];
+    view.forEach(x => rows.push([...cols.map(c => x[c]), x._prov, x._offices.map(o => o.representative).filter(Boolean).join('; ')].map(q).join(',')));
+    const blob = new Blob(['\ufeff' + rows.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    const a = el('a'); a.href = URL.createObjectURL(blob); a.download = 'lpk_filter.csv'; document.body.append(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+
+  // ---------- Events ----------
+  let t;
+  $('#q').addEventListener('input', e => {
+    clearTimeout(t); const v = e.target.value;
+    $('#clearQ').classList.toggle('show', !!v);
+    t = setTimeout(() => { S.q = v.trim(); apply(); }, 150);
+  });
+  $('#clearQ').onclick = () => { $('#q').value = ''; $('#clearQ').classList.remove('show'); S.q = ''; apply(); $('#q').focus(); };
+  $('#fProv').onchange = e => { S.prov = e.target.value; apply(); };
+  $('#fYear').onchange = e => { S.year = e.target.value; apply(); };
+  $('#fSort').onchange = e => { S.sort = e.target.value; apply(); };
+  document.querySelectorAll('.chip').forEach(c => c.onclick = () => {
+    const k = c.dataset.f; S[k] = !S[k]; c.setAttribute('aria-pressed', S[k]); apply();
+  });
+  $('#moreBtn').onclick = () => { shown += PAGE; render(); };
+  $('#csvBtn').onclick = downloadCSV;
+  $('#resetBtn').onclick = () => {
+    Object.assign(S, { q: '', prov: '', year: '', sort: 'name', office: false, web: false, wa: false, info: false });
+    $('#q').value = ''; $('#clearQ').classList.remove('show');
+    $('#fProv').value = ''; $('#fYear').value = ''; $('#fSort').value = 'name';
+    document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', 'false'));
+    apply();
+  };
+  new IntersectionObserver(([en]) => $('#toolbar').classList.toggle('stuck', !en.isIntersecting), { threshold: 1 })
+    .observe(Object.assign(document.body.insertBefore(el('div'), document.body.firstChild), { style: 'height:1px' }));
+
+  init();
+})();
+</script>
+</body>
+</html>
